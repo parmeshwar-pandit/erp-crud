@@ -37,6 +37,54 @@
                     <a href="./list.html" class="btn btn-sm btn-success float-right">All Product</a>
                     <br>
                     <hr>
+                    <div class="col-md-8">
+                      <div id="productError"></div>
+                      <form enctype="multipart/form-data" id="productForm">
+                        <div class="form-group">
+                          <label for="title">Title</label>
+                          <input type="text" class="form-control" id="title" placeholder="Title" required>
+                        </div>
+                        <div class="form-group">
+                          <label for="description">Description</label>
+                          <textarea class="form-control" id="description" placeholder="Description"></textarea>
+                        </div>
+                        <div class="form-row">
+                          <div class="form-group col-md-3">
+                            <label for="price">Price</label>
+                            <input type="text" class="form-control" id="price" placeholder="Price">
+                          </div>
+                          <div class="form-group col-md-3">
+                            <label for="discountPercentage">Discount(%)</label>
+                            <input type="text" class="form-control" id="discountPercentage" placeholder="Discount(%)">
+                          </div>
+                          <div class="form-group col-md-3">
+                            <label for="rating">Rating</label>
+                            <input type="text" class="form-control" id="rating" placeholder="Rating">
+                          </div>
+                          <div class="form-group col-md-3">
+                            <label for="stock">Stock</label>
+                            <input type="text" class="form-control" id="stock" placeholder="Stock">
+                          </div>
+                        </div>
+                        <div class="form-row">
+                          <div class="form-group col-md-6">
+                            <label for="brand">Brand</label>
+                            <input type="text" class="form-control" id="brand" placeholder="Brand">
+                          </div>
+                          <div class="form-group col-md-6">
+                            <label for="category">Category</label>
+                            <select id="category" class="form-control">
+                              <option value="">Select...</option>
+                            </select>
+                          </div>
+                        </div>
+                        <div class="form-group">
+                          <label for="images">Images</label>
+                          <input type="file" class="form-control" id="images" name="images[]" placeholder="Images">
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-block" id="saveProduct">Save Product</button>
+                      </form>
+                    </div>
                 </div>
             </div>
         </div>
@@ -49,6 +97,84 @@
           if (!isLogedin) {
             window.location.href = './login.html';
           }
+          // $('#title').on('keyup keydown focus', function(){
+          //     if ($(this).val().length) {
+          //         $(this).css({'border': '1px solid green'});
+          //     } else {
+          //         $(this).css({'border': '1px solid red'});    
+          //     }
+          // })
+          $.ajax({
+            url: 'https://dummyjson.com/products/categories',
+            type: 'get',
+            contentType: 'application/json',
+            success: function(response) {
+              console.log('category response', response);
+              var categoryHtml = '';
+              categoryHtml += '<option value="">Select...</option>';
+              for (var category of response) {
+                categoryHtml += '<option value="' + category + '">' + category + '</option>';
+              }
+              $('#category').html(categoryHtml);
+            },
+            error: function(error) {
+              console.log('category error:', error)
+            }
+          });
+
+          $('#saveProduct').on('click', function(e){
+            e.preventDefault();
+            $('#saveProduct').prop('disabled', true);
+            var productError = '';
+            var title = $('#title').val();
+            var description = $('#description').val();
+            var price = $('#price').val();
+            var discountPercentage = $('#discountPercentage').val();
+            var rating = $('#rating').val();
+            var stock = $('#stock').val();
+            var brand = $('#brand').val();
+            var category = $('#category').val();
+            var images = $('#images').val();
+            if (!title.length) {
+              productError += 'Title can not be empty.<br>';
+            }
+            if (!price.length) {
+              productError += 'Price can not be empty.<br>';
+            }
+            if (!stock.length) {
+              productError += 'Stock can not be empty.<br>';
+            }
+            if (productError.length) {
+              $('#productError').html('<div class="alert alert-danger">' + productError + '</div>');
+              $('#saveProduct').prop('disabled', false);
+              setTimeout(function(){
+                $('#productError').html('');
+              }, 3000);
+              return false;
+            }
+            var productData = {
+              title: title, description, price, discountPercentage, rating, stock, brand, images
+            }
+            console.log('productData', productData)
+            $.ajax({
+              url: 'https://dummyjson.com/products/add',
+              type: 'post',
+              contentType: 'application/json',
+              data: JSON.stringify(productData),
+              success: function(response) {
+                console.log('save product response:', response)
+                $('#productError').html('<div class="alert alert-success">Product save successfully.</div>');
+                $('#saveProduct').prop('disabled', false);
+                $('#productForm').trigger("reset");
+                setTimeout(function(){
+                  $('#productError').html('');
+                }, 3000);
+              },
+              error: function(error) {
+                console.log('save product error:', error)
+              }
+            });
+          });
     </script>
   </body>
 </html>
