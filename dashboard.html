@@ -4,10 +4,9 @@
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css" integrity="sha512-MV7K8+y+gLIBoVD59lQIYicR65iaqukzvf/nwasF0nqhPay5w/9lJmVM2hMDcnK1OnMGCdVK+iQrJ7lzPJQd1w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <title>Dashboard</title>
   </head>
   <body>
@@ -16,13 +15,13 @@
             <div class="col-md-2">
                 <ul class="nav flex-column">
                     <li class="nav-item">
-                      <a class="nav-link active" href="#">Dashboard</a>
+                      <a class="nav-link active test" href="#">Dashboard</a>
                     </li>
                     <li class="nav-item">
-                      <a class="nav-link" href="#">Profile</a>
+                      <a class="nav-link" href="#" id="profileModal">Profile</a>
                     </li>
                     <li class="nav-item">
-                      <a class="nav-link" href="#">Products</a>
+                      <a class="nav-link" href="./products/list.html">Products</a>
                     </li>
                     <li class="nav-item">
                       <a class="nav-link" href="#">Posts</a>
@@ -51,45 +50,99 @@
         </div>
     </div>
 
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Profile Update</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+              <form>
+                <div id="profileErrors"></div>
+
+                <div class="form-group row">
+                    <div class="col">
+                        <label for="firstName">First name</label>
+                        <input type="text" class="form-control" id="firstName" name="firstName" placeholder="First name">
+                    </div>
+                    <div class="col">
+                        <label for="lastName">Last name</label>
+                        <input type="text" class="form-control" id="lastName" name="lastName" placeholder="Last name">
+                    </div>
+                </div>
+                <div class="form-group">
+                  <label for="email">Email</label>
+                  <input type="email" class="form-control" id="email" name="email" placeholder="Email">
+                </div>
+                <div class="form-group">
+                  <label for="password">Password</label>
+                  <input type="password" class="form-control" id="password" name="password" placeholder="Password">
+                </div>
+              </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary" id="updateProfile">Save changes</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5Vg3Q9ct" crossorigin="anonymous"></script>
     <script src="./script.js"></script>
     <script>
-        // var user = {
-        //   firstName: 'sandip',
-        //   lastName: 'pandit',
-        //   email: 'sandip@gmail.com',
-        //   phone: 42343433212
-        // }
-
-        // function getUser() {
-        //   $('#userList').append(`
-        //     <tr>
-        //       <td>${getFullName(user)}</td>
-        //       <td>${user.email}</td>
-        //       <td>${user.phone}</td>
-        //     </tr>
-        //   `)
-        // }
-        // getUser();
-
-        // function getFullName(user) {
-        //   var fullName = '';
-        //   if (user.firstName) {
-        //     fullName += user.firstName;
-        //   }
-        //   if (user.lastName) {
-        //     fullName += ' ' + user.lastName
-        //   }
-        //   if (!user.firstName && !user.lastName) {
-        //     fullName += '-'
-        //   }
-        //   return fullName;
-        // }
-          var isLogedin = isLogedin();
+      		var isLogedin = isLogedin();
           if (!isLogedin) {
             window.location.href = './login.html';
           }
+          $('#profileModal').click(function(){
+            $('#exampleModal').modal('show')
+            var loginUserData = localStorage.getItem('logedinUser');
+            console.log('loginUserData', loginUserData);
+            var loginUser = JSON.parse(loginUserData);
+            $('#firstName').val(loginUser.firstName);
+            $('#lastName').val(loginUser.lastName);
+            $('#email').val(loginUser.email);
+            $('#password').val(loginUser.password);
+          });
+          $('#updateProfile').click(function(e){
+            e.preventDefault();
+            var profileErrors = '';
+            var firstName = $('#firstName').val();
+            var lastName = $('#lastName').val();
+            var email = $('#email').val();
+            var password = $('#password').val();
+            if (!password.length) {
+              profileErrors += 'Password can not be empty.';
+            }
+            if (profileErrors.length) {
+              $('#profileErrors').html('<div class="alert alert-danger">' + profileErrors + '</div>');
+              setTimeout(function(){
+                $('#profileErrors').html('');
+              }, 3000);
+              return false;
+            }
+            var profileData = {
+              firstName: firstName,
+              lastName: lastName,
+              email: email,
+              password: password
+            }
+            var isProfileUpdated = updateUser(profileData);
+            if (isProfileUpdated) {
+              $('#profileErrors').html('<div class="alert alert-success">Profile updated successfully.</div>');
+            } else {
+              $('#profileErrors').html('<div class="alert alert-danger">Profile not updated.</div>');
+            }
+            setTimeout(function(){
+                $('#profileErrors').html('');
+            }, 3000);
+          });
     </script>
   </body>
 </html>

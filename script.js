@@ -38,6 +38,7 @@ function login(userData) {
     if (user.password != userData.password) {
         return false;
     }
+    localStorage.setItem('logedinUser', JSON.stringify(user));
     return true;
 }
 
@@ -71,6 +72,36 @@ function isLogedin() {
 function logout () {
     localStorage.setItem('isLogedin', false);
     window.location.href = './login.html';
+}
+
+function updateUser(userData) {
+    try {
+        var logedinUser = getLogedinUser();
+        // logedinUser.email = 'pama@gmail.com'
+        // userData.email = 'parmeshwar@gmail.com'
+        var allUsers = getDataByKey('users');
+        console.log('old users', getDataByKey('users'));
+        allUsers.map(function(obj){
+            if (logedinUser.email == obj.email) {
+                obj.firstName = userData.firstName;
+                obj.lastName = userData.lastName;
+                obj.email = userData.email;
+                obj.password = userData.password;
+            }
+        });
+        console.log('new users', allUsers);
+        localStorage.setItem('users', JSON.stringify(allUsers));
+        localStorage.setItem('logedinUser', JSON.stringify(userData));
+        return true;
+    } catch (error) {
+        return false;
+    }
+}
+
+function getLogedinUser() {
+    var logedinUserData = localStorage.getItem('logedinUser');
+    var logedinUser = JSON.parse(logedinUserData);
+    return logedinUser;
 }
 
 // [
